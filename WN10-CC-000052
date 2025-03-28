@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    This PowerShell script ensures that the convenience PIN for windows 10 is disabled.
+    This PowerShell script ensures that Windows 10 is configured to prioritize ECC Curves with longer key lengths first.
 
 .NOTES
     Author          : Paulo Silva
