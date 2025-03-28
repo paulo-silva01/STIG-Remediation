@@ -27,14 +27,22 @@
 
 $RegistryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Cryptography\Configuration\SSL\00010002"
 $ValueName = "EccCurves"
-$ValueData = [byte[]]@(0x4e, 0x00, 0x69, 0x00, 0x73, 0x00, 0x74, 0x00, 0x50, 0x00, 0x33, 0x00, 0x38, 0x00, 0x34, 0x00, 0x00, 0x00, 0x4e, 0x00, 0x69, 0x00, 0x73, 0x00, 0x74, 0x00, 0x50, 0x00, 0x32, 0x00, 0x35, 0x00, 0x36, 0x00, 0x00, 0x00, 0x00, 0x00)
+$DefaultValueName = "(Default)"
+$ExpectedValue = @("NistP384", "NistP256")
 
-# Check if the registry path exists, if not, create it
+# Check if the registry path exists
 if (-not (Test-Path $RegistryPath)) {
+    # Create the registry path if it does not exist
     New-Item -Path $RegistryPath -Force
+    Write-Host "Registry path created: $RegistryPath"
 }
 
-# Set the registry value
-New-ItemProperty -Path $RegistryPath -Name $ValueName -Value $ValueData -PropertyType "Binary" -Force
+# Set the default value ("@=") to an empty string
+Set-ItemProperty -Path $RegistryPath -Name $DefaultValueName -Value ""
 
-Write-Host "Registry key and value have been set successfully."
+# Set the "EccCurves" value with REG_MULTI_SZ
+# The values need to be separated by a newline (or null-terminated for multi-string)
+Set-ItemProperty -Path $RegistryPath -Name $ValueName -Value $ExpectedValue -Type MultiString
+
+Write-Host "Registry key and values have been set successfully."
+
