@@ -1,0 +1,48 @@
+<#
+.SYNOPSIS
+    This PowerShell script ensures that PowerShell script block logging is enabled on Windows 10.
+
+.NOTES
+    Author          : Paulo Silva
+    LinkedIn        : https://www.linkedin.com/in/psilva96/
+    GitHub          : https://github.com/paulo-silva01
+    Date Created    : 2025-03-28
+    Last Modified   : 2025-03-28
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000326
+
+.TESTED ON
+    Date(s) Tested  : 
+    Tested By       : 
+    Systems Tested  : 
+    PowerShell Ver. : 
+
+.USAGE
+    Put any usage instructions here.
+    Example syntax:
+    PS C:\> .\STIG-ID-WN10-CC-000326.ps1 
+#>
+
+$RegistryPathPowerShell = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell"
+$RegistryPathScriptBlockLogging = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"
+$ValueName = "EnableScriptBlockLogging"
+$ValueData = 1  # Equivalent to dword:00000001
+
+# Check if the registry path for PowerShell exists, if not, create it
+if (-not (Test-Path $RegistryPathPowerShell)) {
+    New-Item -Path $RegistryPathPowerShell -Force
+    Write-Host "Registry path created: $RegistryPathPowerShell"
+}
+
+# Check if the registry path for ScriptBlockLogging exists, if not, create it
+if (-not (Test-Path $RegistryPathScriptBlockLogging)) {
+    New-Item -Path $RegistryPathScriptBlockLogging -Force
+    Write-Host "Registry path created: $RegistryPathScriptBlockLogging"
+}
+
+# Set the "EnableScriptBlockLogging" value to 1 (dword:00000001)
+Set-ItemProperty -Path $RegistryPathScriptBlockLogging -Name $ValueName -Value $ValueData -Type DWord
+
+Write-Host "Registry keys and values have been set successfully."
