@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    This PowerShell script ensures that users are prevented from changing installation options
+    This PowerShell script ensures that users are prevented from changing installation options.
 
 .NOTES
     Author          : Paulo Silva
@@ -25,3 +25,15 @@
     PS C:\> .\STIG-ID-WN10-CC-000310.ps1 
 #>
 
+# Define the registry path
+$InstallerPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Installer"
+
+# Check if the registry key exists, and create it if not
+if (-not (Test-Path $InstallerPath)) {
+    New-Item -Path $InstallerPath -Force
+}
+
+# Set the "EnableUserControl" registry value under "Installer"
+Set-ItemProperty -Path $InstallerPath -Name "EnableUserControl" -Value 0 -Type DWord
+
+Write-Host "Registry key and value have been set successfully."
