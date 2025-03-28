@@ -1,0 +1,52 @@
+<#
+.SYNOPSIS
+    This PowerShell script ensures that the system is configured to audit Account Logon - Credential Validation Failures.
+
+.NOTES
+    Author          : Paulo Silva
+    LinkedIn        : https://www.linkedin.com/in/psilva96/
+    GitHub          : https://github.com/paulo-silva01
+    Date Created    : 2025-03-28
+    Last Modified   : 2025-03-28
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-AU-000005
+
+.TESTED ON
+    Date(s) Tested  : 
+    Tested By       : 
+    Systems Tested  : 
+    PowerShell Ver. : 
+
+.USAGE
+    Put any usage instructions here.
+    Example syntax:
+    PS C:\> .\STIG-ID-WN10-AU-000005.ps1 
+#>
+
+# Function to check if Credential Validation - Failure is enabled
+function Check-CredentialValidationFailure {
+    $auditPolicy = AuditPol /get /category:*
+
+    # Check if Credential Validation under Account Logon has Failure auditing enabled
+    if ($auditPolicy -match "Account Logon.*Credential Validation.*Failure") {
+        Write-Host "Credential Validation - Failure auditing is already enabled."
+    } else {
+        Write-Host "Credential Validation - Failure auditing is not enabled. Enabling now..."
+        Enable-CredentialValidationFailure
+    }
+}
+
+# Function to enable Credential Validation - Failure auditing
+function Enable-CredentialValidationFailure {
+    # Enable the Credential Validation - Failure audit setting via AuditPol
+    # Run AuditPol to set the "Credential Validation" to "Failure" under Account Logon
+    Write-Host "Enabling Credential Validation - Failure auditing..."
+    AuditPol /set /subcategory:"Credential Validation" /success:disable /failure:enable
+
+    Write-Host "Credential Validation - Failure auditing has been enabled."
+}
+
+# Run the check and enable function
+Check-CredentialValidationFailure
