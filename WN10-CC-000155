@@ -1,0 +1,50 @@
+<#
+.SYNOPSIS
+    This PowerShell script ensures that solicited Remote Assistance is not allowed.
+
+.NOTES
+    Author          : Paulo Silva
+    LinkedIn        : https://www.linkedin.com/in/psilva96/
+    GitHub          : https://github.com/paulo-silva01
+    Date Created    : 2025-03-28
+    Last Modified   : 2025-03-28
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000155
+
+.TESTED ON
+    Date(s) Tested  : 
+    Tested By       : 
+    Systems Tested  : 
+    PowerShell Ver. : 
+
+.USAGE
+    Put any usage instructions here.
+    Example syntax:
+    PS C:\> .\STIG-ID-WN10-AU-000155.ps1 
+#>
+
+# Registry paths
+$TerminalServicesPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services"
+$ClientPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client"
+$UsbBlockDevicePath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client\UsbBlockDeviceBySetupClasses"
+$UsbSelectDevicePath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client\UsbSelectDeviceByInterfaces"
+
+# Set registry values under "Terminal Services"
+Set-ItemProperty -Path $TerminalServicesPath -Name "KeepAliveEnable" -Value 1 -Type DWord
+Set-ItemProperty -Path $TerminalServicesPath -Name "KeepAliveInterval" -Value 1 -Type DWord
+Set-ItemProperty -Path $TerminalServicesPath -Name "fAllowToGetHelp" -Value 0 -Type DWord
+
+# Set registry values under "Terminal Services\Client"
+Set-ItemProperty -Path $ClientPath -Name "fEnableUsbBlockDeviceBySetupClass" -Value 1 -Type DWord
+Set-ItemProperty -Path $ClientPath -Name "fEnableUsbNoAckIsochWriteToDevice" -Value 80 -Type DWord
+Set-ItemProperty -Path $ClientPath -Name "fEnableUsbSelectDeviceByInterface" -Value 1 -Type DWord
+
+# Set registry value under "Terminal Services\Client\UsbBlockDeviceBySetupClasses"
+Set-ItemProperty -Path $UsbBlockDevicePath -Name "1000" -Value "{3376f4ce-ff8d-40a2-a80f-bb4359d1415c}" -Type String
+
+# Set registry value under "Terminal Services\Client\UsbSelectDeviceByInterfaces"
+Set-ItemProperty -Path $UsbSelectDevicePath -Name "1000" -Value "{6bdd1fc6-810f-11d0-bec7-08002be2092f}" -Type String
+
+Write-Host "Registry keys and values have been set successfully."
