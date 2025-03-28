@@ -1,0 +1,44 @@
+<#
+.SYNOPSIS
+    This PowerShell script ensures that the Windows Remote Management (WinRM) does not use basic authentication.
+
+.NOTES
+    Author          : Paulo Silva
+    LinkedIn        : https://www.linkedin.com/in/psilva96/
+    GitHub          : https://github.com/paulo-silva01
+    Date Created    : 2025-03-28
+    Last Modified   : 2025-03-28
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000345
+
+.TESTED ON
+    Date(s) Tested  : 
+    Tested By       : 
+    Systems Tested  : 
+    PowerShell Ver. : 
+
+.USAGE
+    Put any usage instructions here.
+    Example syntax:
+    PS C:\> .\STIG-ID-WN10-AU-000345.ps1 
+#>
+
+# Define the registry paths
+$WinRMPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM"
+$ServicePath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM\Service"
+
+# Create the registry keys if they don't exist
+if (-not (Test-Path $WinRMPath)) {
+    New-Item -Path $WinRMPath -Force
+}
+
+if (-not (Test-Path $ServicePath)) {
+    New-Item -Path $ServicePath -Force
+}
+
+# Set the "AllowBasic" registry value under "WinRM\Service"
+Set-ItemProperty -Path $ServicePath -Name "AllowBasic" -Value 0 -Type DWord
+
+Write-Host "Registry keys and values have been set successfully."
