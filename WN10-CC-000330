@@ -1,0 +1,42 @@
+<#
+.SYNOPSIS
+    This PowerShell script ensures that the Windows Remote Management (WinRM) does not use Basic Authentication.
+
+.NOTES
+    Author          : Paulo Silva
+    LinkedIn        : https://www.linkedin.com/in/psilva96/
+    GitHub          : https://github.com/paulo-silva01
+    Date Created    : 2025-03-29
+    Last Modified   : 2025-03-29
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000330
+
+.TESTED ON
+    Date(s) Tested  : 
+    Tested By       : 
+    Systems Tested  : 
+    PowerShell Ver. : 
+
+.USAGE
+    Put any usage instructions here.
+    Example syntax:
+    PS C:\> .\STIG-ID-WN10-CC-000330.ps1 
+#>
+
+# Define the registry path for WinRM Client
+$WinRMClientPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM\Client"
+
+# Check if the registry key exists, and create it if not
+if (-not (Test-Path $WinRMClientPath)) {
+    New-Item -Path $WinRMClientPath -Force
+}
+
+# Set the "AllowDigest" registry value under "WinRM\Client"
+Set-ItemProperty -Path $WinRMClientPath -Name "AllowDigest" -Value 0 -Type DWord
+
+# Set the "AllowBasic" registry value under "WinRM\Client"
+Set-ItemProperty -Path $WinRMClientPath -Name "AllowBasic" -Value 0 -Type DWord
+
+Write-Host "Registry keys and values have been set successfully."
