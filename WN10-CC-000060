@@ -1,0 +1,39 @@
+<#
+.SYNOPSIS
+    This PowerShell script ensures that connections to non-domain networks when connected to a domain authenticated network are blocked.
+
+.NOTES
+    Author          : Paulo Silva
+    LinkedIn        : https://www.linkedin.com/in/psilva96/
+    GitHub          : https://github.com/paulo-silva01
+    Date Created    : 2025-03-29
+    Last Modified   : 2025-03-29
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-AU-000060
+
+.TESTED ON
+    Date(s) Tested  : 
+    Tested By       : 
+    Systems Tested  : 
+    PowerShell Ver. : 
+
+.USAGE
+    Put any usage instructions here.
+    Example syntax:
+    PS C:\> .\STIG-ID-WN10-AU-000060.ps1 
+#>
+
+# Define the registry path
+$RegistryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WcmSvc\GroupPolicy"
+
+# Check if the registry key exists, and create it if not
+if (-not (Test-Path $RegistryPath)) {
+    New-Item -Path $RegistryPath -Force
+}
+
+# Set the registry value
+Set-ItemProperty -Path $RegistryPath -Name "fBlockNonDomain" -Value 1 -Type DWord
+
+Write-Host "Registry key and value have been set successfully."
