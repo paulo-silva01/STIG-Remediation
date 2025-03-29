@@ -1,0 +1,68 @@
+<#
+.SYNOPSIS
+    This PowerShell script ensures that Local drives are prevented from sharing with Remote Desktop Session Hosts.
+
+.NOTES
+    Author          : Paulo Silva
+    LinkedIn        : https://www.linkedin.com/in/psilva96/
+    GitHub          : https://github.com/paulo-silva01
+    Date Created    : 2025-03-29
+    Last Modified   : 2025-03-29
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000275
+
+.TESTED ON
+    Date(s) Tested  : 
+    Tested By       : 
+    Systems Tested  : 
+    PowerShell Ver. : 
+
+.USAGE
+    Put any usage instructions here.
+    Example syntax:
+    PS C:\> .\STIG-ID-WN10-CC-000275.ps1 
+#>
+
+# Define registry paths
+$TerminalServicesPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services"
+$TerminalServicesClientPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client"
+$UsbBlockDeviceBySetupClassesPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client\UsbBlockDeviceBySetupClasses"
+$UsbSelectDeviceByInterfacesPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client\UsbSelectDeviceByInterfaces"
+
+# Check if the registry keys exist, and create them if not
+if (-not (Test-Path $TerminalServicesPath)) {
+    New-Item -Path $TerminalServicesPath -Force
+}
+
+if (-not (Test-Path $TerminalServicesClientPath)) {
+    New-Item -Path $TerminalServicesClientPath -Force
+}
+
+if (-not (Test-Path $UsbBlockDeviceBySetupClassesPath)) {
+    New-Item -Path $UsbBlockDeviceBySetupClassesPath -Force
+}
+
+if (-not (Test-Path $UsbSelectDeviceByInterfacesPath)) {
+    New-Item -Path $UsbSelectDeviceByInterfacesPath -Force
+}
+
+# Set registry values for Terminal Services
+Set-ItemProperty -Path $TerminalServicesPath -Name "KeepAliveEnable" -Value 1 -Type DWord
+Set-ItemProperty -Path $TerminalServicesPath -Name "KeepAliveInterval" -Value 1 -Type DWord
+Set-ItemProperty -Path $TerminalServicesPath -Name "fAllowToGetHelp" -Value 0 -Type DWord
+Set-ItemProperty -Path $TerminalServicesPath -Name "fDisableCdm" -Value 1 -Type DWord
+
+# Set registry values for Terminal Services Client
+Set-ItemProperty -Path $TerminalServicesClientPath -Name "fEnableUsbBlockDeviceBySetupClass" -Value 1 -Type DWord
+Set-ItemProperty -Path $TerminalServicesClientPath -Name "fEnableUsbNoAckIsochWriteToDevice" -Value 0x50 -Type DWord
+Set-ItemProperty -Path $TerminalServicesClientPath -Name "fEnableUsbSelectDeviceByInterface" -Value 1 -Type DWord
+
+# Set registry values for UsbBlockDeviceBySetupClasses
+Set-ItemProperty -Path $UsbBlockDeviceBySetupClassesPath -Name "1000" -Value "{3376f4ce-ff8d-40a2-a80f-bb4359d1415c}" -Type String
+
+# Set registry values for UsbSelectDeviceByInterfaces
+Set-ItemProperty -Path $UsbSelectDeviceByInterfacesPath -Name "1000" -Value "{6bdd1fc6-810f-11d0-bec7-08002be2092f}" -Type String
+
+Write-Host "Registry keys and values have been set successfully."
