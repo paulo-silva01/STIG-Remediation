@@ -1,0 +1,43 @@
+<#
+.SYNOPSIS
+    This PowerShell script ensures that Web publishing and online ordering wizards are prevented from downloading a list of providers.
+
+.NOTES
+    Author          : Paulo Silva
+    LinkedIn        : https://www.linkedin.com/in/psilva96/
+    GitHub          : https://github.com/paulo-silva01
+    Date Created    : 2025-03-28
+    Last Modified   : 2025-03-28
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-AU-000105
+
+.TESTED ON
+    Date(s) Tested  : 
+    Tested By       : 
+    Systems Tested  : 
+    PowerShell Ver. : 
+
+.USAGE
+    Put any usage instructions here.
+    Example syntax:
+    PS C:\> .\STIG-ID-WN10-AU-000105.ps1 
+#>
+
+# Define the registry path for Explorer
+$ExplorerPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer"
+
+# Check if the registry key exists, and create it if not
+if (-not (Test-Path $ExplorerPath)) {
+    New-Item -Path $ExplorerPath -Force
+}
+
+# Set registry values under Explorer
+Set-ItemProperty -Path $ExplorerPath -Name "ForceActiveDesktopOn" -Value 0 -Type DWord
+Set-ItemProperty -Path $ExplorerPath -Name "NoActiveDesktop" -Value 1 -Type DWord
+Set-ItemProperty -Path $ExplorerPath -Name "NoActiveDesktopChanges" -Value 1 -Type DWord
+Set-ItemProperty -Path $ExplorerPath -Name "NoRecentDocsHistory" -Value 0 -Type DWord
+Set-ItemProperty -Path $ExplorerPath -Name "NoWebServices" -Value 1 -Type DWord
+
+Write-Host "Registry keys and values have been set successfully."
