@@ -1,0 +1,90 @@
+<#
+.SYNOPSIS
+    This PowerShell script ensures that the setting to allow Microsoft accounts to be optional for modern style apps are enabled.
+
+.NOTES
+    Author          : Paulo Silva
+    LinkedIn        : https://www.linkedin.com/in/psilva96/
+    GitHub          : https://github.com/paulo-silva01
+    Date Created    : 2025-03-29
+    Last Modified   : 2025-03-29
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-AU-000170
+
+.TESTED ON
+    Date(s) Tested  : 
+    Tested By       : 
+    Systems Tested  : 
+    PowerShell Ver. : 
+
+.USAGE
+    Put any usage instructions here.
+    Example syntax:
+    PS C:\> .\STIG-ID-WN10-AU-000170.ps1 
+#>
+
+# Define the registry paths and the respective values
+$registryPaths = @(
+    "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System",
+    "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\Audit",
+    "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\UIPI",
+    "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\UIPI\Clipboard",
+    "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\UIPI\Clipboard\ExceptionFormats"
+)
+
+# Create the registry keys if they don't exist
+foreach ($path in $registryPaths) {
+    if (-not (Test-Path $path)) {
+        New-Item -Path $path -Force
+    }
+}
+
+# Set the values for the specified registry key
+$values = @{
+    "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" = @{
+        "ConsentPromptBehaviorAdmin" = 5
+        "ConsentPromptBehaviorUser" = 3
+        "DSCAutomationHostEnabled" = 2
+        "EnableCursorSuppression" = 1
+        "EnableFullTrustStartupTasks" = 2
+        "EnableInstallerDetection" = 1
+        "EnableLUA" = 1
+        "EnableSecureUIAPaths" = 1
+        "EnableUIADesktopToggle" = 0
+        "EnableUwpStartupTasks" = 2
+        "EnableVirtualization" = 1
+        "PromptOnSecureDesktop" = 1
+        "SupportFullTrustStartupTasks" = 1
+        "SupportUwpStartupTasks" = 1
+        "ValidateAdminCodeSignatures" = 0
+        "dontdisplaylastusername" = 0
+        "legalnoticecaption" = ""
+        "legalnoticetext" = ""
+        "scforceoption" = 0
+        "shutdownwithoutlogon" = 1
+        "undockwithoutlogon" = 1
+        "LocalAccountTokenFilterPolicy" = 1
+        "MSAOptional" = 1
+    }
+
+    "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\UIPI\Clipboard\ExceptionFormats" = @{
+        "CF_BITMAP" = 2
+        "CF_DIB" = 8
+        "CF_DIBV5" = 17
+        "CF_OEMTEXT" = 7
+        "CF_PALETTE" = 9
+        "CF_TEXT" = 1
+        "CF_UNICODETEXT" = 13
+    }
+}
+
+# Loop through the values and set each one
+foreach ($path in $values.Keys) {
+    foreach ($name in $values[$path].Keys) {
+        Set-ItemProperty -Path $path -Name $name -Value $values[$path][$name] -Type DWord
+    }
+}
+
+Write-Host "Registry keys and values have been successfully set."
