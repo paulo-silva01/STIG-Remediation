@@ -1,0 +1,75 @@
+<#
+.SYNOPSIS
+    This PowerShell script ensures that the system is configured to ignore NetBIOS name release requests except from WINS servers.
+
+.NOTES
+    Author          : Paulo Silva
+    LinkedIn        : https://www.linkedin.com/in/psilva96/
+    GitHub          : https://github.com/paulo-silva01
+    Date Created    : 2025-03-29
+    Last Modified   : 2025-03-29
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-AU-000035
+
+.TESTED ON
+    Date(s) Tested  : 
+    Tested By       : 
+    Systems Tested  : 
+    PowerShell Ver. : 
+
+.USAGE
+    Put any usage instructions here.
+    Example syntax:
+    PS C:\> .\STIG-ID-WN10-AU-000035.ps1 
+#>
+
+# Define registry paths
+$NetBTPath = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters"
+$InterfacesPath = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces"
+$Interface1Path = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_{15e3885d-6f76-4f7a-b48b-5a0c5890db23}"
+$Interface2Path = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_{41789d14-570c-4adc-89b7-0381386a742c}"
+
+# Check if the registry keys exist, and create them if not
+if (-not (Test-Path $NetBTPath)) {
+    New-Item -Path $NetBTPath -Force
+}
+
+if (-not (Test-Path $InterfacesPath)) {
+    New-Item -Path $InterfacesPath -Force
+}
+
+if (-not (Test-Path $Interface1Path)) {
+    New-Item -Path $Interface1Path -Force
+}
+
+if (-not (Test-Path $Interface2Path)) {
+    New-Item -Path $Interface2Path -Force
+}
+
+# Set registry values under NetBT Parameters
+Set-ItemProperty -Path $NetBTPath -Name "BcastNameQueryCount" -Value 3 -Type DWord
+Set-ItemProperty -Path $NetBTPath -Name "BcastQueryTimeout" -Value 750 -Type DWord
+Set-ItemProperty -Path $NetBTPath -Name "CacheTimeout" -Value 600000 -Type DWord
+Set-ItemProperty -Path $NetBTPath -Name "EnableLMHOSTS" -Value 1 -Type DWord
+Set-ItemProperty -Path $NetBTPath -Name "NameServerPort" -Value 137 -Type DWord
+Set-ItemProperty -Path $NetBTPath -Name "NameSrvQueryCount" -Value 3 -Type DWord
+Set-ItemProperty -Path $NetBTPath -Name "NameSrvQueryTimeout" -Value 1500 -Type DWord
+Set-ItemProperty -Path $NetBTPath -Name "NbProvider" -Value "_tcp" -Type String
+Set-ItemProperty -Path $NetBTPath -Name "SessionKeepAlive" -Value 3600000 -Type DWord
+Set-ItemProperty -Path $NetBTPath -Name "Size/Small/Medium/Large" -Value 1 -Type DWord
+Set-ItemProperty -Path $NetBTPath -Name "TransportBindName" -Value "\\Device\\" -Type String
+Set-ItemProperty -Path $NetBTPath -Name "UseNewSmb" -Value 1 -Type DWord
+Set-ItemProperty -Path $NetBTPath -Name "NoNameReleaseOnDemand" -Value 1 -Type DWord
+
+# Set registry values under Interfaces
+# For the first interface (Tcpip_{15e3885d-6f76-4f7a-b48b-5a0c5890db23})
+Set-ItemProperty -Path $Interface1Path -Name "NameServerList" -Value ([byte[]]@(0x00, 0x00)) -Type Binary
+Set-ItemProperty -Path $Interface1Path -Name "NetbiosOptions" -Value 0 -Type DWord
+
+# For the second interface (Tcpip_{41789d14-570c-4adc-89b7-0381386a742c})
+Set-ItemProperty -Path $Interface2Path -Name "NameServerList" -Value ([byte[]]@(0x00, 0x00)) -Type Binary
+Set-ItemProperty -Path $Interface2Path -Name "NetbiosOptions" -Value 0 -Type DWord
+
+Write-Host "Registry keys and values have been set successfully."
