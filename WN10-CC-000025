@@ -1,0 +1,37 @@
+<#
+.SYNOPSIS
+    This PowerShell script ensures that the system is configured to prevent IP source routing.
+
+.NOTES
+    Author          : Paulo Silva
+    LinkedIn        : https://www.linkedin.com/in/psilva96/
+    GitHub          : https://github.com/paulo-silva01
+    Date Created    : 2025-03-31
+    Last Modified   : 2025-03-31
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000025
+
+.TESTED ON
+    Date(s) Tested  : 
+    Tested By       : 
+    Systems Tested  : 
+    PowerShell Ver. : 
+
+.USAGE
+    Put any usage instructions here.
+    Example syntax:
+    PS C:\> .\STIG-ID-WN10-CC-000025.ps1 
+#>
+
+# Define the registry path and value
+$regPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"
+$regName = "DisableIPSourceRouting"
+$regValue = 0x02  # DWORD value
+
+# Set the registry value
+Set-ItemProperty -Path $regPath -Name $regName -Value $regValue
+
+# Confirm the change
+Write-Host "DisableIPSourceRouting has been set to $regValue"
