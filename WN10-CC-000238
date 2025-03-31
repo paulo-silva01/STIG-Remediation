@@ -1,0 +1,47 @@
+<#
+.SYNOPSIS
+    This PowerShell script ensures that Windows 10 is configured to prevent certificate error overrides in Microsoft Edge.
+
+.NOTES
+    Author          : Paulo Silva
+    LinkedIn        : https://www.linkedin.com/in/psilva96/
+    GitHub          : https://github.com/paulo-silva01
+    Date Created    : 2025-03-31
+    Last Modified   : 2025-03-31
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000238
+
+.TESTED ON
+    Date(s) Tested  : 
+    Tested By       : 
+    Systems Tested  : 
+    PowerShell Ver. : 
+
+.USAGE
+    Put any usage instructions here.
+    Example syntax:
+    PS C:\> .\STIG-ID-WN10-CC-000238.ps1 
+#>
+
+# Define the registry paths and values
+$regPathEdge = "HKLM:\SOFTWARE\Policies\Microsoft\MicrosoftEdge"
+$regPathInternetSettings = "HKLM:\SOFTWARE\Policies\Microsoft\MicrosoftEdge\Internet Settings"
+$regName = "PreventCertErrorOverrides"
+$regValue = 0x01  # DWORD value for 1
+
+# Ensure the parent registry paths exist
+if (-not (Test-Path $regPathEdge)) {
+    New-Item -Path $regPathEdge -Force
+}
+
+if (-not (Test-Path $regPathInternetSettings)) {
+    New-Item -Path $regPathInternetSettings -Force
+}
+
+# Set the registry value
+Set-ItemProperty -Path $regPathInternetSettings -Name $regName -Value $regValue
+
+# Confirm the change
+Write-Host "PreventCertErrorOverrides has been set to $regValue"
